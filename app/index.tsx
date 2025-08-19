@@ -1,10 +1,12 @@
 import React from 'react';
 import { navigate } from "expo-router/build/global-state/routing";
-import { Text, View, Button, StyleSheet, StatusBar } from "react-native";
+import { Text, View, Button, StyleSheet, StatusBar, Platform } from "react-native";
 import * as NavigationBar from 'expo-navigation-bar';
 
 export default function Index() {
-  NavigationBar.setVisibilityAsync("hidden");
+  if (Platform.OS === "android") {
+      NavigationBar.setVisibilityAsync("hidden");
+  }
 
   const startGame = () => {
     navigate("./game");

@@ -60,7 +60,9 @@ const HandDisplay = (props: HandDisplayProps) => {
 }
 
 export default function Index() {
-    NavigationBar.setVisibilityAsync("hidden");
+    if (Platform.OS === "android") {
+        NavigationBar.setVisibilityAsync("hidden");
+    }
 
     const getTableauCards = () => {
         return tableau.map((it) => {
