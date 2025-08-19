@@ -204,6 +204,10 @@ export class CardCollection {
     }
 }
 
+interface DeckProps {
+    cards: Card[];
+}
+
 export class Deck {
     cards = new CardCollection();
 
@@ -215,8 +219,8 @@ export class Deck {
         this.shuffle();
     }
 
-    Element = () => {
-        const colorStyle = { backgroundColor: this.cards.pile.length > 0 ? "red" : "gray" }
+    Element = (props: DeckProps) => {
+        const colorStyle = { backgroundColor: props.cards.length > 0 ? "red" : "gray" }
 
         return (
             <Pressable style={[styleSheet.deck, getCardDimensions(), colorStyle]}>

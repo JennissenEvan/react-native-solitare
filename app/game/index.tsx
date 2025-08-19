@@ -67,8 +67,12 @@ export default function Index() {
         });
     };
     const [tableauCards, setTableauCards] = useState<Card[][]>(getTableauCards());
+    const [stockCards, setStockCards] = useState<Card[]>([...stock.cards.pile]);
+    const [talonCards, setTalonCards] = useState<Card[]>([...talon.cardStack.pile]);
     const updateCardCollections = () => {
         setTableauCards(getTableauCards());
+        setStockCards([...stock.cards.pile]);
+        setTalonCards([...talon.cardStack.pile]);
     }
 
     const [handCards, setHandCards] = useState<Card[]>([]);
@@ -206,10 +210,10 @@ export default function Index() {
                         <View style={styleSheet.shelf}>
                             <View style={styleSheet.drawZone}>
                                 <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-                                    <stock.Element/>
+                                    <stock.Element cards={stockCards}/>
                                 </View>
                                 <View style={styleSheet.talonZone}>
-                                    <talon.Element/>
+                                    <talon.Element cards={talonCards}/>
                                 </View>
                             </View>
                             <View style={styleSheet.foundations}>

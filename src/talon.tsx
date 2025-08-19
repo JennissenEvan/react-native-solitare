@@ -1,12 +1,16 @@
-import { CardCollection } from "./deck";
+import { Card, CardCollection } from "./deck";
+
+interface TalonProps {
+    cards: Card[];
+}
 
 export default class Talon {
     cardStack = new CardCollection();
 
-    Element = () => {
-        const cardCount = this.cardStack.pile.length;
+    Element = (props: TalonProps) => {
+        const cardCount = props.cards.length;
         if (cardCount > 0) {
-            const topCard = this.cardStack.pile[cardCount - 1];
+            const topCard = props.cards[cardCount - 1];
             return <topCard.Element/>;
         } else {
             return <></>;
