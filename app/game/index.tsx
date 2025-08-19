@@ -10,8 +10,10 @@ import Animated, { AnimatedRef, measure, MeasuredDimensions, runOnJS, useAnimate
 import { allSuits, Card, CardCollection, CardDragContext, Deck, Position, PostCardDragCallback } from "../../src/deck";
 import SharedDropActionArea from '@/src/sharedDropActionArea';
 import * as NavigationBar from 'expo-navigation-bar';
+import Talon from '@/src/talon';
 
 const stock = new Deck();
+const talon = new Talon();
 const foundations = allSuits.map((it) => new Foundation(it));
 const tableau = Array.from(Array(7).keys()).map((i) => {
     const pile = new TableauPile();
@@ -21,6 +23,8 @@ const tableau = Array.from(Array(7).keys()).map((i) => {
     pile.update();
     return pile;
 });
+talon.cardStack.put(stock.draw()!!);
+
 const hand = new CardCollection();
 
 let cardReturnCallback: PostCardDragCallback | undefined;
@@ -201,7 +205,12 @@ export default function Index() {
                         <StatusBar/>
                         <View style={styleSheet.shelf}>
                             <View style={styleSheet.drawZone}>
-                                <stock.Element/>
+                                <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+                                    <stock.Element/>
+                                </View>
+                                <View style={styleSheet.talonZone}>
+                                    <talon.Element/>
+                                </View>
                             </View>
                             <View style={styleSheet.foundations}>
                                 { foundations.map((it, i) => <it.Element key={i} ref={foundationDropAreas[i].ref}/>) }
@@ -261,5 +270,14 @@ const styleSheet = StyleSheet.create({
         alignItems: "stretch",
         alignContent: "center",
         width: "100%",
+    },
+    talonZone: {
+        flex: 3,
+        height: "75%",
+        borderColor: "#262626",
+        borderWidth: 2,
+        backgroundColor: "#006622",
+        alignItems: "center",
+        justifyContent: "center"
     }
 });
