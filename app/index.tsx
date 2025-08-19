@@ -5,7 +5,7 @@ import * as NavigationBar from 'expo-navigation-bar';
 
 export default function Index() {
   if (Platform.OS === "android") {
-      NavigationBar.setVisibilityAsync("hidden");
+    NavigationBar.setVisibilityAsync("hidden");
   }
 
   const startGame = () => {
