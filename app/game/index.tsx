@@ -11,6 +11,7 @@ import { allSuits, Card, CardCollection, CardDragContext, Deck, Position, PostCa
 import SharedDropActionArea from '@/src/sharedDropActionArea';
 import * as NavigationBar from 'expo-navigation-bar';
 import Talon from '@/src/talon';
+import RefreshCardsContext from '@/src/refreshCardsContext';
 
 const stock = new Deck();
 const talon = new Talon();
@@ -210,7 +211,9 @@ export default function Index() {
                         <View style={styleSheet.shelf}>
                             <View style={styleSheet.drawZone}>
                                 <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-                                    <stock.Element cards={stockCards}/>
+                                    <RefreshCardsContext value={updateCardCollections}>
+                                        <stock.Element cards={stockCards}/>
+                                    </RefreshCardsContext>
                                 </View>
                                 <View style={styleSheet.talonZone}>
                                     <talon.Element cards={talonCards}/>

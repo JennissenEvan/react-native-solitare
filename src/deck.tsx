@@ -2,6 +2,7 @@ import React, { createContext, useContext } from "react";
 import { Dimensions, Platform, Pressable, StyleProp, StyleSheet, Text, useWindowDimensions, View, ViewStyle } from "react-native";
 import Animated, { measure, MeasuredDimensions, runOnJS, runOnUI, useAnimatedRef } from 'react-native-reanimated';
 import UsesAnimatedRef from "./usesAnimatedRef";
+import RefreshCardsContext from "./refreshCardsContext";
 
 const suitColor = {
     RED: Symbol("Red"),
@@ -220,10 +221,16 @@ export class Deck {
     }
 
     Element = (props: DeckProps) => {
+        const refreshCards = useContext(RefreshCardsContext);
+
         const colorStyle = { backgroundColor: props.cards.length > 0 ? "red" : "gray" }
 
+        const drawCallback = () => {
+            refreshCards();
+        };
+
         return (
-            <Pressable style={[styleSheet.deck, getCardDimensions(), colorStyle]}>
+            <Pressable style={[styleSheet.deck, getCardDimensions(), colorStyle]} onPress={drawCallback}>
                 <Text>Deck</Text>
             </Pressable>
         );
