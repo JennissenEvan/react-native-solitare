@@ -214,7 +214,7 @@ export default function Index() {
                             <View style={styleSheet.drawZone}>
                                 <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
                                     <RefreshCardsContext value={updateCardCollections}>
-                                        <stock.Element cards={stockCards}/>
+                                        <stock.Element cards={stockCards} talon={talon}/>
                                     </RefreshCardsContext>
                                 </View>
                                 <View style={styleSheet.talonZone}>

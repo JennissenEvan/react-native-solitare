@@ -3,6 +3,7 @@ import { Dimensions, Platform, Pressable, StyleProp, StyleSheet, Text, useWindow
 import Animated, { measure, MeasuredDimensions, runOnJS, runOnUI, useAnimatedRef } from 'react-native-reanimated';
 import UsesAnimatedRef from "./usesAnimatedRef";
 import RefreshCardsContext from "./refreshCardsContext";
+import Talon from "./talon";
 
 const suitColor = {
     RED: Symbol("Red"),
@@ -207,6 +208,7 @@ export class CardCollection {
 
 interface DeckProps {
     cards: Card[];
+    talon: Talon;
 }
 
 export class Deck {
@@ -226,6 +228,14 @@ export class Deck {
         const colorStyle = { backgroundColor: props.cards.length > 0 ? "red" : "gray" }
 
         const drawCallback = () => {
+            if (this.cards.pile.length > 0) {
+                props.talon.cardStack.put(this.draw()!!);
+            } else {
+                props.talon.cardStack.pile.slice(1).forEach((it) => {
+                    this.cards.put(it);
+                });
+            }
+            
             refreshCards();
         };
 
