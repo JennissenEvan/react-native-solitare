@@ -56,16 +56,19 @@ const rankNamesInOrder = [
 const ranks = rankNamesInOrder.toReversed().map((value, i) => new Rank(value, i + 1));
 
 export function getRawCardDimensions() {
-    const CARD_SIZE_FACTOR = Platform.OS !== "web" ? .20 : .08;
+    const CARD_SIZE_FACTOR = .11;
     const LENGTH_FACTOR = 1 + (1/3);
 
     const windowDimensions = Dimensions.get("screen");
     let cardSize: number;
-    if (windowDimensions.height * 16 > windowDimensions.width * 9) {
-        cardSize = windowDimensions.width * CARD_SIZE_FACTOR;
+    const adjustedHeight = windowDimensions.height * 16;
+    const adjustedWidth = windowDimensions.width * 9;
+    if (adjustedHeight > adjustedWidth) {
+        cardSize = adjustedWidth * CARD_SIZE_FACTOR;
     } else {
-        cardSize = windowDimensions.height * CARD_SIZE_FACTOR;
+        cardSize = adjustedHeight * CARD_SIZE_FACTOR;
     }
+    cardSize /= 10;
 
     return {
         width: cardSize,
