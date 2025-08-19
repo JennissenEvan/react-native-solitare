@@ -113,7 +113,6 @@ export default function Index() {
         const validDropAreas = collidingDropAreas.map((it) => {
             return { receiver: dropAreas[it.receiverIndex].receiver, ref: it.ref } as DropActionArea
         }).filter((it) => {
-            console.log(it.receiver.canDrop(hand.pile))
             return it.receiver.canDrop(hand.pile);
         });
 

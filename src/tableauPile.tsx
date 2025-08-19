@@ -1,6 +1,6 @@
 import { useContext, useState } from "react";
-import { StyleSheet, View } from "react-native";
-import { Card, CardCollection, CardDragContext, DownturnedCard, getCardSpacing, getRawCardDimensions, Position, PostCardDragCallback } from "./deck";
+import { Animated, StyleSheet, View } from "react-native";
+import { Card, CardCollection, CardDragContext, DownturnedCard, getCardDimensions, getCardSpacing, getRawCardDimensions, Position, PostCardDragCallback } from "./deck";
 import DropActionReceiver from "./dropActionReceiver";
 import UsesAnimatedRef from "./usesAnimatedRef";
 import CardCollectionDisplay from "./cardCollectionDisplay";
@@ -49,23 +49,31 @@ export default class TableauPile implements DropActionReceiver {
 
         const pileItems = getPileItems();
 
-        const cardHeight = getRawCardDimensions().height;
-        const cardSpacing = getCardSpacing();
+        if (pileItems.length > 0) {
+            const cardHeight = getRawCardDimensions().height;
+            const cardSpacing = getCardSpacing();
 
-        return (
-            <View style={styleSheet.tableauPile}>
-                <CardDragContext value={cardDragCallback}>
-                    {
-                        pileItems.map((it, i) => {
-                            const compressBy = (-cardHeight + cardSpacing) * i;
-                            const cardRef = i == pileItems.length - 1 ? props.ref : undefined;
-                            const key = `${pileItems.length}-${i}`
-                            return (it.isVisible ? <it.card.Element y={compressBy} key={key} ref={cardRef}/> : <DownturnedCard y={compressBy} key={key}/>);
-                        })
-                    }
-                </CardDragContext>
-            </View>
-        );
+            return (
+                <View style={styleSheet.tableauPile}>
+                    <CardDragContext value={cardDragCallback}>
+                        {
+                            pileItems.map((it, i) => {
+                                const compressBy = (-cardHeight + cardSpacing) * i;
+                                const cardRef = i == pileItems.length - 1 ? props.ref : undefined;
+                                const key = `${pileItems.length}-${i}`
+                                return (it.isVisible ? <it.card.Element y={compressBy} key={key} ref={cardRef}/> : <DownturnedCard y={compressBy} key={key}/>);
+                            })
+                        }
+                    </CardDragContext>
+                </View>
+            );
+        } else {
+            return (
+                <View style={styleSheet.tableauPile}>
+                    <Animated.View style={[getCardDimensions(), { borderColor: "#262626", borderWidth: 2 }]} ref={props.ref}/>
+                </View>
+            )
+        }
     }
 
     update() {
@@ -79,13 +87,15 @@ export default class TableauPile implements DropActionReceiver {
     }
 
     canDrop(cards: Card[]) {
+        const topHandCard = cards[0];
+
         const visibleCards = this.visibleStack.pile.length;
-
-        if (cards.length == 0 || visibleCards == 0) return false;
-
-        const handCard = cards[0];
-        const tableauCard = this.visibleStack.pile[visibleCards - 1];
-        return handCard.rank.value == tableauCard.rank.value - 1 && handCard.suit.color !== tableauCard.suit.color;
+        if (visibleCards > 0)  {
+            const tableauCard = this.visibleStack.pile[visibleCards - 1];
+            return topHandCard.rank.value == tableauCard.rank.value - 1 && topHandCard.suit.color !== tableauCard.suit.color;
+        } else {
+            return topHandCard.rank.name === "K";
+        }
     }
 
     drop(cards: Card[]) {
