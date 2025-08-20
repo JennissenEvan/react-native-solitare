@@ -244,7 +244,7 @@ export class Card {
             <Animated.View style={[styleSheet.card, generateCardStyle(props), getCardDimensions()]} ref={baseAnimatedRef}>
                 <Animated.View ref={props.ref} style={{ flex: 1 }}>
                     <Pressable onPressIn={cardPickup} style={{ width: "100%", height: "100%"}}>
-                        <Image source={cardAsset} style={{ width: "100%", height: "100%" }}/>
+                        <Image source={cardAsset} style={{ width: "100%", height: "100%", zIndex: -1, borderRadius: 8 }}/>
                     </Pressable>
                 </Animated.View>
             </Animated.View>
@@ -253,7 +253,11 @@ export class Card {
 }
 
 export const DownturnedCard = (props: CardProps) => {
-    return (<View style={[styleSheet.downturnedCard, generateCardStyle(props), getCardDimensions()]}/>);
+    return (
+        <View style={[styleSheet.downturnedCard, generateCardStyle(props), getCardDimensions()]}>
+            <Image source={require("../assets/images/card_back.png")} style={{ width: "100%", height: "100%" }}/>
+        </View>
+    );
 }
 
 export class CardCollection {
@@ -329,8 +333,8 @@ export class Deck {
         };
 
         return (
-            <Pressable style={[styleSheet.deck, getCardDimensions(), colorStyle]} onPress={drawCallback}>
-                <Text>Deck</Text>
+            <Pressable onPress={drawCallback}>
+                <DownturnedCard/>
             </Pressable>
         );
     }
@@ -351,9 +355,9 @@ export class Deck {
 
 const styleSheet = StyleSheet.create({
     downturnedCard: {
-        borderWidth: 3,
-        borderRadius: 10,
-        backgroundColor: "blue"
+        borderWidth: 2,
+        borderRadius: 8,
+        backgroundColor: "white"
     },
     card: {
         borderWidth: 2,
