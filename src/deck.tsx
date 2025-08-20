@@ -156,6 +156,10 @@ export class Card {
                 let position = new Position(0, 0);
                 if (measurement !== null) {
                     position = new Position(measurement.pageX, measurement.pageY);
+
+                    if (Platform.OS !== "web") {
+                        position = position.translated(-measurement.width / 4, measurement.height / 4);
+                    }
                 }
 
                 const returnPile = thisCard.collection;
