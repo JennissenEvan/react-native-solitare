@@ -18,7 +18,7 @@ export default function Index() {
       <View style={{flex: 1,justifyContent: "center",alignItems: "center",}}>
         <Text style={styleSheet.title}>SOLITARE</Text>
       </View>
-      <Button title="Play" onPress={ () => startGame() }/>
+      <Button title="Play" onPress={ () => startGame() } color={"green"}/>
       <View style={{flex: 1}}/>
     </View>
   );

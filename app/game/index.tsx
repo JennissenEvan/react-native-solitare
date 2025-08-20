@@ -12,6 +12,7 @@ import SharedDropActionArea from '@/src/sharedDropActionArea';
 import * as NavigationBar from 'expo-navigation-bar';
 import Talon from '@/src/talon';
 import RefreshCardsContext from '@/src/refreshCardsContext';
+import { navigate } from 'expo-router/build/global-state/routing';
 
 const stock = new Deck();
 const talon = new Talon();
@@ -250,7 +251,7 @@ export default function Index() {
                     <View style={styleSheet.menu}>
                         <Button title="Continue" color={"green"} onPress={() => setMenuVisible(false)}/>
                         <Button title="New Game" color={"green"}/>
-                        <Button title="Return to Title" color={"green"}/>
+                        <Button title="Return to Title" color={"green"} onPress={() => navigate("/")}/>
                     </View>
                 </View>
             </Modal>
