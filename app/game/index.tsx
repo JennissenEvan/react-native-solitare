@@ -4,7 +4,7 @@ import DropActionReceiver from "@/src/dropActionReceiver";
 import { Foundation } from "@/src/foundation";
 import TableauPile from "@/src/tableauPile";
 import { useState } from "react";
-import { Platform, StatusBar, StyleProp, StyleSheet, useWindowDimensions, View, ViewStyle } from "react-native";
+import { Button, Modal, Platform, StatusBar, StyleProp, StyleSheet, useWindowDimensions, View, ViewStyle } from "react-native";
 import { Gesture, GestureDetector, GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, { AnimatedRef, measure, MeasuredDimensions, runOnJS, useAnimatedRef, useAnimatedStyle, useSharedValue } from "react-native-reanimated";
 import { allSuits, Card, CardCollection, CardDragContext, Deck, Position, PostCardDragCallback } from "../../src/deck";
@@ -63,6 +63,8 @@ export default function Index() {
     if (Platform.OS === "android") {
         NavigationBar.setVisibilityAsync("hidden");
     }
+
+    const [menuVisible, setMenuVisible] = useState(false);
 
     const getTableauCards = () => {
         return tableau.map((it) => {
@@ -226,13 +228,32 @@ export default function Index() {
                         </View>
                         <View style={styleSheet.table}>
                             <View style={styleSheet.tableau}>
+                                <View style={styleSheet.tableauGutterLeft}/>
                                 { tableau.map((it, i) => <it.Element key={i} ref={tableauDropAreas[i].ref} cards={tableauCards[i]}/>) }
+                                <View style={styleSheet.tableauGutterRight}>
+                                    <View style={{ flex: 2 }}/>
+                                    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+                                        <Button title={"menu"} color={"green"} onPress={() => setMenuVisible(true)}/>
+                                    </View>
+                                </View>
                             </View>
                         </View>
                         <HandDisplay handCards={handCards} ref={handRef} cardRef={handCardRef} initialPosition={handPosition} style={[handAnimatedStyle]}/>
                     </CardDragContext>
                 </View>
             </GestureDetector>
+            <Modal visible={menuVisible} transparent={true}>
+                <View style={styleSheet.menuBackroundOverlay}/>
+            </Modal>
+            <Modal visible={menuVisible} transparent>
+                <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+                    <View style={styleSheet.menu}>
+                        <Button title="Continue" color={"green"}/>
+                        <Button title="New Game" color={"green"}/>
+                        <Button title="Return to Title" color={"green"}/>
+                    </View>
+                </View>
+            </Modal>
         </GestureHandlerRootView>
     );
 }
@@ -279,6 +300,12 @@ const styleSheet = StyleSheet.create({
         alignContent: "center",
         width: "100%",
     },
+    tableauGutterLeft: {
+        flex: 0.25
+    },
+    tableauGutterRight: {
+        flex: 0.75
+    },
     talonZone: {
         flex: 3,
         height: "75%",
@@ -287,5 +314,20 @@ const styleSheet = StyleSheet.create({
         backgroundColor: "#006622",
         alignItems: "center",
         justifyContent: "center"
+    },
+    menuBackroundOverlay: {
+        width: "100%", 
+        height: "100%", 
+        backgroundColor: "rgba(0, 0, 0, 1)", 
+        opacity: 0.5
+    },
+    menu: {
+        width: "30%",
+        height: "80%",
+        borderRadius: 5,
+        borderWidth: 4,
+        backgroundColor: "#006622",
+        alignItems: "center",
+        justifyContent: "space-evenly"
     }
 });
