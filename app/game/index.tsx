@@ -12,6 +12,7 @@ import { Button, Modal, Platform, StatusBar, StyleProp, StyleSheet, Text, useWin
 import { Gesture, GestureDetector, GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, { AnimatedRef, measure, runOnJS, useAnimatedRef, useAnimatedStyle, useSharedValue } from "react-native-reanimated";
 import { allSuits, Card, CardCollection, CardDragContext, Deck, Position, PostCardDragCallback } from "../../src/deck";
+import PopupMenu from "@/src/popupMenu";
 
 let stock: Deck;
 let talon: Talon;
@@ -307,18 +308,11 @@ export default function Index() {
             </TransactionContext>
             </View>
         </GestureDetector>
-        <Modal visible={menuVisible} transparent={true}>
-            <View style={styleSheet.menuBackroundOverlay}/>
-        </Modal>
-        <Modal visible={menuVisible} transparent>
-            <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-                <View style={styleSheet.menu}>
-                    <Button title="Continue" color={"green"} onPress={() => setMenuVisible(false)}/>
-                    <Button title="New Game" color={"green"} onPress={() => { startNewGame(); updateCardCollections(); setMenuVisible(false); }}/>
-                    <Button title="Return to Title" color={"green"} onPress={() => navigate("/")}/>
-                </View>
-            </View>
-        </Modal>
+        <PopupMenu visible={menuVisible}>
+            <Button title="Continue" color={"green"} onPress={() => setMenuVisible(false)}/>
+            <Button title="New Game" color={"green"} onPress={() => { startNewGame(); updateCardCollections(); setMenuVisible(false); }}/>
+            <Button title="Return to Title" color={"green"} onPress={() => navigate("/")}/>
+        </PopupMenu>
         </GestureHandlerRootView>
     );
 }
@@ -380,21 +374,6 @@ const styleSheet = StyleSheet.create({
         backgroundColor: "#006622",
         alignItems: "center",
         justifyContent: "center"
-    },
-    menuBackroundOverlay: {
-        width: "100%", 
-        height: "100%", 
-        backgroundColor: "rgba(0, 0, 0, 1)", 
-        opacity: 0.5
-    },
-    menu: {
-        width: "30%",
-        height: "80%",
-        borderRadius: 5,
-        borderWidth: 4,
-        backgroundColor: "#006622",
-        alignItems: "center",
-        justifyContent: "space-evenly"
     },
     scoreBox: {
         flex: 1, 
