@@ -3,6 +3,7 @@ import { Card, CardCollection, getCardDimensions, Suit } from "./deck";
 import { View, StyleSheet, Text } from "react-native";
 import DropActionReceiver from "./dropActionReceiver";
 import Animated, { AnimatedRef } from "react-native-reanimated";
+import { TransactionController } from "./transaction";
 
 interface FoundationProps {
     ref: AnimatedRef<View>;
@@ -49,10 +50,10 @@ export class Foundation implements DropActionReceiver {
         return card.suit === this.suit && card.rank.value == (topCard?.rank.value ?? 0) + 1;
     }
 
-    drop(cards: Card[]) {
+    drop(cards: Card[], transaction: TransactionController) {
         if (cards.length != 1) return;
 
-        this.cardStack.put(cards[0]);
+        transaction.add(cards, this.cardStack);
     }
 }
 

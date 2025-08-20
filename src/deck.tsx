@@ -2,8 +2,8 @@ import React, { createContext, useContext } from "react";
 import { Dimensions, Platform, Pressable, StyleProp, StyleSheet, Text, useWindowDimensions, View, ViewStyle } from "react-native";
 import Animated, { measure, MeasuredDimensions, runOnJS, runOnUI, useAnimatedRef } from 'react-native-reanimated';
 import UsesAnimatedRef from "./usesAnimatedRef";
-import RefreshCardsContext from "./refreshCardsContext";
 import Talon from "./talon";
+import { TransactionContext, TransactionController } from "./transaction";
 
 const suitColor = {
     RED: Symbol("Red"),
@@ -119,7 +119,7 @@ export type CardDragCallback = (
     cards: Card[], 
     initialPosition: Position, 
     returnCallback?: PostCardDragCallback,
-    movedCallback?: () => void
+    movedCallback?: (transaction: TransactionController) => void
 ) => void;
 
 export const CardDragContext = createContext<CardDragCallback | undefined>(undefined);
@@ -131,6 +131,11 @@ export class Card {
     label: String;
 
     collection: CardCollection | undefined;
+    temporaryCollection: CardCollection | undefined;
+
+    currentCollection() {
+        return this.temporaryCollection ?? this.collection;
+    }
 
     constructor(suit: Suit, rank: Rank) {
         this.suit = suit;
@@ -190,14 +195,26 @@ export const DownturnedCard = (props: CardProps) => {
 export class CardCollection {
     pile: Card[] = [];
 
+    isSecondary: boolean;
+
+    constructor(isSecondary: boolean = false) {
+        this.isSecondary = isSecondary;
+    }
+
     put(card: Card) {
-        if (card.collection !== undefined) {
-            const pile = card.collection.pile;
+        const cardCurrentCollection = card.currentCollection();
+        if (cardCurrentCollection !== undefined) {
+            const pile = cardCurrentCollection.pile;
             pile.splice(pile.indexOf(card), 1);
         }
 
         this.pile.push(card);
-        card.collection = this;
+        if (this.isSecondary) {
+            card.temporaryCollection = this;
+        } else {
+            card.collection = this;
+            card.temporaryCollection = undefined;
+        }
     }
 
     draw() {
@@ -226,20 +243,22 @@ export class Deck {
     }
 
     Element = (props: DeckProps) => {
-        const refreshCards = useContext(RefreshCardsContext);
+        const createTransaction = useContext(TransactionContext);
 
         const colorStyle = { backgroundColor: props.cards.length > 0 ? "red" : "gray" }
 
         const drawCallback = () => {
             if (this.cards.pile.length > 0) {
-                props.talon.cardStack.put(this.draw()!!);
+                const transaction = createTransaction(0, 50);
+                transaction.add(this.cards.pile.slice(-1), props.talon.cardStack);
+                transaction.commit();
             } else {
-                props.talon.cardStack.pile.slice(1).forEach((it) => {
-                    this.cards.put(it);
-                });
+                const transaction = createTransaction(-500, 50);
+                const returnedCards = [...props.talon.cardStack.pile].toReversed();
+                transaction.add(returnedCards, this.cards);
+                transaction.add(returnedCards.slice(-1), props.talon.cardStack);
+                transaction.commit();
             }
-            
-            refreshCards();
         };
 
         return (

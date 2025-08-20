@@ -4,6 +4,7 @@ import { Card, CardCollection, CardDragContext, DownturnedCard, getCardDimension
 import DropActionReceiver from "./dropActionReceiver";
 import UsesAnimatedRef from "./usesAnimatedRef";
 import CardCollectionDisplay from "./cardCollectionDisplay";
+import { TransactionController } from "./transaction";
 
 const TABLEAU_COMPRESSION = 130;
 
@@ -29,16 +30,18 @@ export default class TableauPile implements DropActionReceiver {
             cards: Card[], 
             initialPosition: Position, 
             superReturnCallback?: PostCardDragCallback,
-            superMovedCallback?: () => void
+            superMovedCallback?: (transaction: TransactionController) => void
         ) => {
             const returnCallback = (cards: Card[]) => {
                 superReturnCallback?.(cards);
             };
-            const movedCallback = () => {
-                superMovedCallback?.();
+            const movedCallback = (transaction: TransactionController) => {
+                superMovedCallback?.(transaction);
                 const faceDownPileLength = this.faceDownCards.pile.length;
                 if (this.visibleStack.pile.length == 0 && faceDownPileLength > 0) {
-                    this.visibleStack.put(this.faceDownCards.pile[faceDownPileLength - 1]);
+                    transaction.add(this.faceDownCards.pile.slice(-1), this.visibleStack);
+                    transaction.addScoreBonus(100);
+                    transaction.addUndoPenalty(250);
                 }
             };
 
@@ -98,10 +101,8 @@ export default class TableauPile implements DropActionReceiver {
         }
     }
 
-    drop(cards: Card[]) {
-        cards.forEach((it) => {
-            this.stack(it);
-        });
+    drop(cards: Card[], transaction: TransactionController) {
+        transaction.add(cards, this.visibleStack);
     }
 }
 

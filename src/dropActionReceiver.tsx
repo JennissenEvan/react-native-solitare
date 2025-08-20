@@ -1,7 +1,7 @@
 import { Card } from "./deck";
-import DropActionArea from "./dropActionArea";
+import { TransactionController } from "./transaction";
 
 export default interface DropActionReceiver {
     canDrop(cards: Card[]): boolean;
-    drop(cards: Card[]): void;
+    drop(cards: Card[], createTransaction: TransactionController): void;
 }

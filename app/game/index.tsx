@@ -1,23 +1,24 @@
-import React from 'react';
 import DropActionArea from "@/src/dropActionArea";
 import DropActionReceiver from "@/src/dropActionReceiver";
 import { Foundation } from "@/src/foundation";
+import SharedDropActionArea from '@/src/sharedDropActionArea';
 import TableauPile from "@/src/tableauPile";
-import { useState } from "react";
+import Talon from '@/src/talon';
+import Transaction, { TransactionContext, TransactionController } from '@/src/transaction';
+import * as NavigationBar from 'expo-navigation-bar';
+import { navigate } from 'expo-router/build/global-state/routing';
+import React, { useState } from 'react';
 import { Button, Modal, Platform, StatusBar, StyleProp, StyleSheet, useWindowDimensions, View, ViewStyle } from "react-native";
 import { Gesture, GestureDetector, GestureHandlerRootView } from "react-native-gesture-handler";
-import Animated, { AnimatedRef, measure, MeasuredDimensions, runOnJS, useAnimatedRef, useAnimatedStyle, useSharedValue } from "react-native-reanimated";
+import Animated, { AnimatedRef, measure, runOnJS, useAnimatedRef, useAnimatedStyle, useSharedValue } from "react-native-reanimated";
 import { allSuits, Card, CardCollection, CardDragContext, Deck, Position, PostCardDragCallback } from "../../src/deck";
-import SharedDropActionArea from '@/src/sharedDropActionArea';
-import * as NavigationBar from 'expo-navigation-bar';
-import Talon from '@/src/talon';
-import RefreshCardsContext from '@/src/refreshCardsContext';
-import { navigate } from 'expo-router/build/global-state/routing';
 
 let stock: Deck;
 let talon: Talon;
 let foundations: Foundation[];
 let tableau: TableauPile[];
+let transactions: Transaction[];
+let score: number;
 function startNewGame() {
     stock = new Deck();
     talon = new Talon();
@@ -31,13 +32,15 @@ function startNewGame() {
         return pile;
     });
     talon.cardStack.put(stock.draw()!!);
+    transactions = [];
+    score = 1000;
 }
 startNewGame();
 
-const hand = new CardCollection();
+const hand = new CardCollection(true);
 
 let cardReturnCallback: PostCardDragCallback | undefined;
-let cardMovedCallback: (() => void) | undefined;
+let cardMovedCallback: ((transaction: TransactionController) => void) | undefined;
 
 interface HandDisplayProps {
     handCards: Card[];
@@ -91,6 +94,33 @@ export default function Index() {
     const [handCards, setHandCards] = useState<Card[]>([]);
     const [handPosition, setHandPosition] = useState(new Position(0, 0));
 
+    const createTransaction = (bonus: number, undoCost: number = 0) => {
+        const transaction = new Transaction(bonus, undoCost);
+
+        return {
+            add: (cards: Card[], destination: CardCollection) => {
+                transaction.add(cards, destination);
+            },
+            commit: () => {
+                if (transactions.includes(transaction)) {
+                    console.warn("Attempted to commit transaction twice.");
+                    return;
+                }
+
+                transaction.perform();
+                transactions.push(transaction);
+                score += transaction.bonus;
+                updateCardCollections();
+            },
+            addScoreBonus: (bonus: number) => {
+                transaction.bonus += bonus;
+            },
+            addUndoPenalty: (penalty: number) => {
+                transaction.undoCost += penalty;
+            }
+        } as TransactionController;
+    }
+
     const mapDropReceivers = (receivers: DropActionReceiver[]) => {
         return receivers.map((it) => ({ receiver: it, ref: useAnimatedRef<View>() } as DropActionArea));
     }
@@ -127,24 +157,27 @@ export default function Index() {
         });
 
         if (validDropAreas.length != 0) {
+            const transaction = createTransaction(0);
             const dropArea = validDropAreas[0]
-            dropArea.receiver.drop([...hand.pile]);
-            return true;
+            dropArea.receiver.drop([...hand.pile], transaction);
+            return transaction;
         }
 
-        return false;
+        return null;
     }
 
     const handReleasedCallback = (collidingDropAreas: SharedDropActionArea[]) => {
-        if (attemptDropCards(collidingDropAreas)) {
-            cardMovedCallback?.();
+        const dropTransaction = attemptDropCards(collidingDropAreas);
+        if (dropTransaction !== null) {
+            cardMovedCallback?.(dropTransaction);
+            dropTransaction.commit();
         } else {
             cardReturnCallback?.([...hand.pile]);
+            updateCardCollections();
         }
         cardReturnCallback = undefined;
         cardMovedCallback = undefined;
         updateHand();
-        updateCardCollections();
     }
 
     const tapAndDrag = Gesture.Pan()
@@ -196,7 +229,7 @@ export default function Index() {
         cards: Card[], 
         initialPosition: Position, 
         returnCallback?: PostCardDragCallback,
-        movedCallback?: () => void
+        movedCallback?: (transaction: TransactionController) => void
     ) => {
         cards.forEach((it) => hand.put(it));
         cardReturnCallback = returnCallback;
@@ -215,53 +248,53 @@ export default function Index() {
 
     return (
         <GestureHandlerRootView>
-            <GestureDetector gesture={tapAndDrag}>
-                <View style={styleSheet.mainView}>
-                    <CardDragContext value={cardDragCallback}>
-                        <StatusBar/>
-                        <View style={styleSheet.shelf}>
-                            <View style={styleSheet.drawZone}>
-                                <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-                                    <RefreshCardsContext value={updateCardCollections}>
-                                        <stock.Element cards={stockCards} talon={talon}/>
-                                    </RefreshCardsContext>
-                                </View>
-                                <View style={styleSheet.talonZone}>
-                                    <talon.Element cards={talonCards}/>
-                                </View>
-                            </View>
-                            <View style={styleSheet.foundations}>
-                                { foundations.map((it, i) => <it.Element key={i} ref={foundationDropAreas[i].ref}/>) }
-                            </View>
+        <GestureDetector gesture={tapAndDrag}>
+            <View style={styleSheet.mainView}>
+            <TransactionContext value={createTransaction}>
+            <CardDragContext value={cardDragCallback}>
+                <StatusBar/>
+                <View style={styleSheet.shelf}>
+                    <View style={styleSheet.drawZone}>
+                        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+                            <stock.Element cards={stockCards} talon={talon}/>
                         </View>
-                        <View style={styleSheet.table}>
-                            <View style={styleSheet.tableau}>
-                                <View style={styleSheet.tableauGutterLeft}/>
-                                { tableau.map((it, i) => <it.Element key={i} ref={tableauDropAreas[i].ref} cards={tableauCards[i]}/>) }
-                                <View style={styleSheet.tableauGutterRight}>
-                                    <View style={{ flex: 2 }}/>
-                                    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-                                        <Button title={"menu"} color={"green"} onPress={() => setMenuVisible(true)}/>
-                                    </View>
-                                </View>
-                            </View>
+                        <View style={styleSheet.talonZone}>
+                            <talon.Element cards={talonCards}/>
                         </View>
-                        <HandDisplay handCards={handCards} ref={handRef} cardRef={handCardRef} initialPosition={handPosition} style={[handAnimatedStyle]}/>
-                    </CardDragContext>
-                </View>
-            </GestureDetector>
-            <Modal visible={menuVisible} transparent={true}>
-                <View style={styleSheet.menuBackroundOverlay}/>
-            </Modal>
-            <Modal visible={menuVisible} transparent>
-                <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-                    <View style={styleSheet.menu}>
-                        <Button title="Continue" color={"green"} onPress={() => setMenuVisible(false)}/>
-                        <Button title="New Game" color={"green"} onPress={() => { startNewGame(); updateCardCollections(); setMenuVisible(false); }}/>
-                        <Button title="Return to Title" color={"green"} onPress={() => navigate("/")}/>
+                    </View>
+                    <View style={styleSheet.foundations}>
+                        { foundations.map((it, i) => <it.Element key={i} ref={foundationDropAreas[i].ref}/>) }
                     </View>
                 </View>
-            </Modal>
+                <View style={styleSheet.table}>
+                    <View style={styleSheet.tableau}>
+                        <View style={styleSheet.tableauGutterLeft}/>
+                        { tableau.map((it, i) => <it.Element key={i} ref={tableauDropAreas[i].ref} cards={tableauCards[i]}/>) }
+                        <View style={styleSheet.tableauGutterRight}>
+                            <View style={{ flex: 2 }}/>
+                            <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+                                <Button title={"menu"} color={"green"} onPress={() => setMenuVisible(true)}/>
+                            </View>
+                        </View>
+                    </View>
+                </View>
+                <HandDisplay handCards={handCards} ref={handRef} cardRef={handCardRef} initialPosition={handPosition} style={[handAnimatedStyle]}/>
+            </CardDragContext>
+            </TransactionContext>
+            </View>
+        </GestureDetector>
+        <Modal visible={menuVisible} transparent={true}>
+            <View style={styleSheet.menuBackroundOverlay}/>
+        </Modal>
+        <Modal visible={menuVisible} transparent>
+            <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+                <View style={styleSheet.menu}>
+                    <Button title="Continue" color={"green"} onPress={() => setMenuVisible(false)}/>
+                    <Button title="New Game" color={"green"} onPress={() => { startNewGame(); updateCardCollections(); setMenuVisible(false); }}/>
+                    <Button title="Return to Title" color={"green"} onPress={() => navigate("/")}/>
+                </View>
+            </View>
+        </Modal>
         </GestureHandlerRootView>
     );
 }
