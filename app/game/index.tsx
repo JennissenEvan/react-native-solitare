@@ -121,6 +121,11 @@ export default function Index() {
         } as TransactionController;
     }
 
+    const undoLastTransaction = () => {
+        transactions.pop()?.rollback();
+        updateCardCollections();
+    };
+
     const mapDropReceivers = (receivers: DropActionReceiver[]) => {
         return receivers.map((it) => ({ receiver: it, ref: useAnimatedRef<View>() } as DropActionArea));
     }
@@ -264,6 +269,9 @@ export default function Index() {
                     </View>
                     <View style={styleSheet.foundations}>
                         { foundations.map((it, i) => <it.Element key={i} ref={foundationDropAreas[i].ref}/>) }
+                    </View>
+                    <View style={{ flex: 0.2, justifyContent: "center", alignItems: "center" }}>
+                        <Button title="undo" color={"green"} onPress={undoLastTransaction}/>
                     </View>
                 </View>
                 <View style={styleSheet.table}>
