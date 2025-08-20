@@ -248,7 +248,7 @@ export default function Index() {
             <Modal visible={menuVisible} transparent>
                 <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
                     <View style={styleSheet.menu}>
-                        <Button title="Continue" color={"green"}/>
+                        <Button title="Continue" color={"green"} onPress={() => setMenuVisible(false)}/>
                         <Button title="New Game" color={"green"}/>
                         <Button title="Return to Title" color={"green"}/>
                     </View>
