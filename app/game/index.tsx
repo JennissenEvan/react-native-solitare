@@ -8,7 +8,7 @@ import Transaction, { TransactionContext, TransactionController } from '@/src/tr
 import * as NavigationBar from 'expo-navigation-bar';
 import { navigate } from 'expo-router/build/global-state/routing';
 import React, { useState } from 'react';
-import { Button, Modal, Platform, StatusBar, StyleProp, StyleSheet, useWindowDimensions, View, ViewStyle } from "react-native";
+import { Button, Modal, Platform, StatusBar, StyleProp, StyleSheet, Text, useWindowDimensions, View, ViewStyle } from "react-native";
 import { Gesture, GestureDetector, GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, { AnimatedRef, measure, runOnJS, useAnimatedRef, useAnimatedStyle, useSharedValue } from "react-native-reanimated";
 import { allSuits, Card, CardCollection, CardDragContext, Deck, Position, PostCardDragCallback } from "../../src/deck";
@@ -85,10 +85,12 @@ export default function Index() {
     const [tableauCards, setTableauCards] = useState<Card[][]>(getTableauCards());
     const [stockCards, setStockCards] = useState<Card[]>([...stock.cards.pile]);
     const [talonCards, setTalonCards] = useState<Card[]>([...talon.cardStack.pile]);
+    const [displayScore, setDisplayScore] = useState(score);
     const updateCardCollections = () => {
         setTableauCards(getTableauCards());
         setStockCards([...stock.cards.pile]);
         setTalonCards([...talon.cardStack.pile]);
+        setDisplayScore(score);
     }
 
     const [handCards, setHandCards] = useState<Card[]>([]);
@@ -122,7 +124,14 @@ export default function Index() {
     }
 
     const undoLastTransaction = () => {
-        transactions.pop()?.rollback();
+        const transaction = transactions.pop();
+
+        if (transaction === undefined) return;
+
+        transaction.rollback();
+        score -= transaction.bonus;
+        score -= transaction.undoCost;
+        score = Math.max(score, 0);
         updateCardCollections();
     };
 
@@ -270,8 +279,14 @@ export default function Index() {
                     <View style={styleSheet.foundations}>
                         { foundations.map((it, i) => <it.Element key={i} ref={foundationDropAreas[i].ref}/>) }
                     </View>
-                    <View style={{ flex: 0.2, justifyContent: "center", alignItems: "center" }}>
-                        <Button title="undo" color={"green"} onPress={undoLastTransaction}/>
+                    <View style={{ flex: 0.2, justifyContent: "center", alignItems: "center", padding: 10 }}>
+                        <View style={styleSheet.scoreBox}>
+                            <Text style={styleSheet.scoreText}>Score:</Text>
+                            <Text style={styleSheet.scoreText}>{displayScore}</Text>
+                        </View>
+                        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+                            <Button title="undo" color={"green"} onPress={undoLastTransaction}/>
+                        </View>
                     </View>
                 </View>
                 <View style={styleSheet.table}>
@@ -378,5 +393,18 @@ const styleSheet = StyleSheet.create({
         backgroundColor: "#006622",
         alignItems: "center",
         justifyContent: "space-evenly"
+    },
+    scoreBox: {
+        flex: 1, 
+        borderWidth: 2, 
+        width: '100%', 
+        alignItems: "center", 
+        justifyContent: "center",
+        margin: 20
+    },
+    scoreText: {
+        fontWeight: 500,
+        color: "white",
+        fontSize: 24
     }
 });
