@@ -1,5 +1,5 @@
 import React, { createContext, useContext } from "react";
-import { Dimensions, Platform, Pressable, StyleProp, StyleSheet, Text, useWindowDimensions, View, ViewStyle } from "react-native";
+import { Dimensions, Image, Platform, Pressable, StyleProp, StyleSheet, Text, useWindowDimensions, View, ViewStyle } from "react-native";
 import Animated, { measure, MeasuredDimensions, runOnJS, runOnUI, useAnimatedRef } from 'react-native-reanimated';
 import UsesAnimatedRef from "./usesAnimatedRef";
 import Talon from "./talon";
@@ -56,8 +56,8 @@ const rankNamesInOrder = [
 const ranks = rankNamesInOrder.toReversed().map((value, i) => new Rank(value, i + 1));
 
 export function getRawCardDimensions() {
-    const CARD_SIZE_FACTOR = .11;
-    const LENGTH_FACTOR = 1 + (1/3);
+    const CARD_SIZE_FACTOR = .10;
+    const LENGTH_FACTOR = 726/500;
 
     const windowDimensions = Dimensions.get("screen");
     let cardSize: number;
@@ -176,11 +176,75 @@ export class Card {
             })();
         };
 
+        //@ts-ignore
+        const cardAsset = {
+            "spades": {
+                "a": require("../assets/images/cards/a_of_spades.png"),
+                "2": require("../assets/images/cards/2_of_spades.png"),
+                "3": require("../assets/images/cards/3_of_spades.png"),
+                "4": require("../assets/images/cards/4_of_spades.png"),
+                "5": require("../assets/images/cards/5_of_spades.png"),
+                "6": require("../assets/images/cards/6_of_spades.png"),
+                "7": require("../assets/images/cards/7_of_spades.png"),
+                "8": require("../assets/images/cards/8_of_spades.png"),
+                "9": require("../assets/images/cards/9_of_spades.png"),
+                "10": require("../assets/images/cards/10_of_spades.png"),
+                "j": require("../assets/images/cards/j_of_spades.png"),
+                "q": require("../assets/images/cards/q_of_spades.png"),
+                "k": require("../assets/images/cards/k_of_spades.png")
+            },
+            "clubs": {
+                "a": require("../assets/images/cards/a_of_clubs.png"),
+                "2": require("../assets/images/cards/2_of_clubs.png"),
+                "3": require("../assets/images/cards/3_of_clubs.png"),
+                "4": require("../assets/images/cards/4_of_clubs.png"),
+                "5": require("../assets/images/cards/5_of_clubs.png"),
+                "6": require("../assets/images/cards/6_of_clubs.png"),
+                "7": require("../assets/images/cards/7_of_clubs.png"),
+                "8": require("../assets/images/cards/8_of_clubs.png"),
+                "9": require("../assets/images/cards/9_of_clubs.png"),
+                "10": require("../assets/images/cards/10_of_clubs.png"),
+                "j": require("../assets/images/cards/j_of_clubs.png"),
+                "q": require("../assets/images/cards/q_of_clubs.png"),
+                "k": require("../assets/images/cards/k_of_clubs.png")
+            },
+            "hearts": {
+                "a": require("../assets/images/cards/a_of_hearts.png"),
+                "2": require("../assets/images/cards/2_of_hearts.png"),
+                "3": require("../assets/images/cards/3_of_hearts.png"),
+                "4": require("../assets/images/cards/4_of_hearts.png"),
+                "5": require("../assets/images/cards/5_of_hearts.png"),
+                "6": require("../assets/images/cards/6_of_hearts.png"),
+                "7": require("../assets/images/cards/7_of_hearts.png"),
+                "8": require("../assets/images/cards/8_of_hearts.png"),
+                "9": require("../assets/images/cards/9_of_hearts.png"),
+                "10": require("../assets/images/cards/10_of_hearts.png"),
+                "j": require("../assets/images/cards/j_of_hearts.png"),
+                "q": require("../assets/images/cards/q_of_hearts.png"),
+                "k": require("../assets/images/cards/k_of_hearts.png")
+            },
+            "diamonds": {
+                "a": require("../assets/images/cards/a_of_diamonds.png"),
+                "2": require("../assets/images/cards/2_of_diamonds.png"),
+                "3": require("../assets/images/cards/3_of_diamonds.png"),
+                "4": require("../assets/images/cards/4_of_diamonds.png"),
+                "5": require("../assets/images/cards/5_of_diamonds.png"),
+                "6": require("../assets/images/cards/6_of_diamonds.png"),
+                "7": require("../assets/images/cards/7_of_diamonds.png"),
+                "8": require("../assets/images/cards/8_of_diamonds.png"),
+                "9": require("../assets/images/cards/9_of_diamonds.png"),
+                "10": require("../assets/images/cards/10_of_diamonds.png"),
+                "j": require("../assets/images/cards/j_of_diamonds.png"),
+                "q": require("../assets/images/cards/q_of_diamonds.png"),
+                "k": require("../assets/images/cards/k_of_diamonds.png")
+            }
+        }[thisCard.suit.name.toLowerCase()][thisCard.rank.name.toLowerCase()];
+
         return (
             <Animated.View style={[styleSheet.card, generateCardStyle(props), getCardDimensions()]} ref={baseAnimatedRef}>
                 <Animated.View ref={props.ref} style={{ flex: 1 }}>
-                    <Pressable onPressIn={cardPickup} style={{width: "100%", height: "100%"}}>
-                        <Text style={{ textAlign: "center" }} selectable={false}>{this.label}</Text>
+                    <Pressable onPressIn={cardPickup} style={{ width: "100%", height: "100%"}}>
+                        <Image source={cardAsset} style={{ width: "100%", height: "100%" }}/>
                     </Pressable>
                 </Animated.View>
             </Animated.View>
@@ -292,8 +356,8 @@ const styleSheet = StyleSheet.create({
         backgroundColor: "blue"
     },
     card: {
-        borderWidth: 3,
-        borderRadius: 10,
+        borderWidth: 2,
+        borderRadius: 8,
         justifyContent: "center",
         alignContent: "center",
         backgroundColor: "white"
