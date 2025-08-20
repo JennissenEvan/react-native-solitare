@@ -364,6 +364,7 @@ const styleSheet = StyleSheet.create({
         alignItems: "stretch",
         alignContent: "center",
         width: "100%",
+        padding: 20
     },
     tableauGutterLeft: {
         flex: 0.25
