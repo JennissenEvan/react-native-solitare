@@ -1,6 +1,6 @@
 import { useContext, useState } from "react";
 import { Animated, StyleSheet, View } from "react-native";
-import { Card, CardCollection, CardDragContext, DownturnedCard, getCardDimensions, getCardSpacing, getRawCardDimensions, Position, PostCardDragCallback } from "./deck";
+import { BlankSpace, Card, CardCollection, CardDragContext, DownturnedCard, getCardDimensions, getCardSpacing, getRawCardDimensions, Position, PostCardDragCallback } from "./deck";
 import DropActionReceiver from "./dropActionReceiver";
 import UsesAnimatedRef from "./usesAnimatedRef";
 import CardCollectionDisplay from "./cardCollectionDisplay";
@@ -73,7 +73,7 @@ export default class TableauPile implements DropActionReceiver {
         } else {
             return (
                 <View style={styleSheet.tableauPile}>
-                    <Animated.View style={[getCardDimensions(), { borderColor: "#262626", borderWidth: 2 }]} ref={props.ref}/>
+                    <BlankSpace ref={props.ref}/>
                 </View>
             )
         }

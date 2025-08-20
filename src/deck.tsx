@@ -1,6 +1,6 @@
 import React, { createContext, useContext } from "react";
 import { Dimensions, Image, Platform, Pressable, StyleProp, StyleSheet, Text, useWindowDimensions, View, ViewStyle } from "react-native";
-import Animated, { measure, MeasuredDimensions, runOnJS, runOnUI, useAnimatedRef } from 'react-native-reanimated';
+import Animated, { AnimatedRef, measure, MeasuredDimensions, runOnJS, runOnUI, useAnimatedRef } from 'react-native-reanimated';
 import UsesAnimatedRef from "./usesAnimatedRef";
 import Talon from "./talon";
 import { TransactionContext, TransactionController } from "./transaction";
@@ -260,6 +260,16 @@ export const DownturnedCard = (props: CardProps) => {
     );
 }
 
+interface BlankSpaceProps {
+    ref?: AnimatedRef<View>;
+}
+
+export const BlankSpace = (props: BlankSpaceProps) => {
+    return (
+        <Animated.View style={[getCardDimensions(), { borderColor: "#262626", borderWidth: 2, borderRadius: 8 }]} ref={props.ref}/>
+    );
+}
+
 export class CardCollection {
     pile: Card[] = [];
 
@@ -334,7 +344,7 @@ export class Deck {
 
         return (
             <Pressable onPress={drawCallback}>
-                <DownturnedCard/>
+                { this.cards.pile.length > 0 ? <DownturnedCard/> : <BlankSpace/> }
             </Pressable>
         );
     }
