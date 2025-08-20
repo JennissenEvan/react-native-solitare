@@ -14,18 +14,25 @@ import Talon from '@/src/talon';
 import RefreshCardsContext from '@/src/refreshCardsContext';
 import { navigate } from 'expo-router/build/global-state/routing';
 
-const stock = new Deck();
-const talon = new Talon();
-const foundations = allSuits.map((it) => new Foundation(it));
-const tableau = Array.from(Array(7).keys()).map((i) => {
-    const pile = new TableauPile();
-    Array.from(Array(i + 1).keys()).forEach(() => {
-        pile.faceDownCards.put(stock.draw()!!);
+let stock: Deck;
+let talon: Talon;
+let foundations: Foundation[];
+let tableau: TableauPile[];
+function startNewGame() {
+    stock = new Deck();
+    talon = new Talon();
+    foundations = allSuits.map((it) => new Foundation(it));
+    tableau = Array.from(Array(7).keys()).map((i) => {
+        const pile = new TableauPile();
+        Array.from(Array(i + 1).keys()).forEach(() => {
+            pile.faceDownCards.put(stock.draw()!!);
+        });
+        pile.update();
+        return pile;
     });
-    pile.update();
-    return pile;
-});
-talon.cardStack.put(stock.draw()!!);
+    talon.cardStack.put(stock.draw()!!);
+}
+startNewGame();
 
 const hand = new CardCollection();
 
@@ -250,7 +257,7 @@ export default function Index() {
                 <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
                     <View style={styleSheet.menu}>
                         <Button title="Continue" color={"green"} onPress={() => setMenuVisible(false)}/>
-                        <Button title="New Game" color={"green"}/>
+                        <Button title="New Game" color={"green"} onPress={() => { startNewGame(); updateCardCollections(); setMenuVisible(false); }}/>
                         <Button title="Return to Title" color={"green"} onPress={() => navigate("/")}/>
                     </View>
                 </View>
