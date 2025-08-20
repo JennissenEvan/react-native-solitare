@@ -112,6 +112,7 @@ export default function Index() {
                 transaction.perform();
                 transactions.push(transaction);
                 score += transaction.bonus;
+                score = Math.max(score, 0);
                 updateCardCollections();
             },
             addScoreBonus: (bonus: number) => {

@@ -253,11 +253,14 @@ export class Deck {
                 transaction.add(this.cards.pile.slice(-1), props.talon.cardStack);
                 transaction.commit();
             } else {
-                const transaction = createTransaction(-500, 50);
-                const returnedCards = [...props.talon.cardStack.pile].toReversed();
-                transaction.add(returnedCards, this.cards);
-                transaction.add(returnedCards.slice(-1), props.talon.cardStack);
-                transaction.commit();
+                const cardsToReturn = [...props.talon.cardStack.pile].toReversed();
+
+                if (cardsToReturn.length > 1) {
+                    const transaction = createTransaction(-250, 50);
+                    transaction.add(cardsToReturn, this.cards);
+                    transaction.add(cardsToReturn.slice(-1), props.talon.cardStack);
+                    transaction.commit();
+                }
             }
         };
 
