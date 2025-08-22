@@ -9,6 +9,10 @@ interface FoundationProps {
     ref: AnimatedRef<View>;
 }
 
+interface BaseFoundationProps extends FoundationProps {
+    topCard: Card | null;
+}
+
 export class Foundation implements DropActionReceiver {
     suit: Suit;
 
@@ -26,12 +30,12 @@ export class Foundation implements DropActionReceiver {
         )
     }
 
-    Element = (props: FoundationProps) => {
-        const topCard = this.getTopCard();
+    Element = (props: BaseFoundationProps) => {
+        const topCard = props.topCard;
 
         return (
             <View>
-                {topCard !== undefined ? <topCard.Element ref={props.ref}/> : <this.EmptyPile ref={props.ref}/>}
+                {topCard !== null ? <topCard.Element ref={props.ref}/> : <this.EmptyPile ref={props.ref}/>}
             </View>
         );
     }

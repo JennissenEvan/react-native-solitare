@@ -83,15 +83,29 @@ export default function Index() {
             return [...it.faceDownCards.pile, ...it.visibleStack.pile];
         });
     };
+    const getFoundationCards = () => {
+        return foundations.map((it) => {
+            return (it.cardStack.pile.slice(-1)[0] ?? null) as (Card | null);
+        });
+    }
     const [tableauCards, setTableauCards] = useState<Card[][]>(getTableauCards());
     const [stockCards, setStockCards] = useState<Card[]>([...stock.cards.pile]);
     const [talonCards, setTalonCards] = useState<Card[]>([...talon.cardStack.pile]);
+    const [foundationCards, setFoundationCards] = useState<(Card | null)[]>(getFoundationCards())
     const [displayScore, setDisplayScore] = useState(score);
     const updateCardCollections = () => {
         setTableauCards(getTableauCards());
         setStockCards([...stock.cards.pile]);
         setTalonCards([...talon.cardStack.pile]);
+        setFoundationCards(getFoundationCards());
         setDisplayScore(score);
+    }
+
+    const isWinState = foundationCards.every((it) => it?.rank.name == "K");
+
+    const reset = () => {
+        startNewGame();
+        updateCardCollections();
     }
 
     const [handCards, setHandCards] = useState<Card[]>([]);
@@ -279,7 +293,7 @@ export default function Index() {
                         </View>
                     </View>
                     <View style={styleSheet.foundations}>
-                        { foundations.map((it, i) => <it.Element key={i} ref={foundationDropAreas[i].ref}/>) }
+                        { foundations.map((it, i) => <it.Element key={i} ref={foundationDropAreas[i].ref} topCard={foundationCards[i]}/>) }
                     </View>
                     <View style={{ flex: 0.2, justifyContent: "center", alignItems: "center", padding: 10 }}>
                         <View style={styleSheet.scoreBox}>
@@ -310,8 +324,13 @@ export default function Index() {
         </GestureDetector>
         <PopupMenu visible={menuVisible}>
             <Button title="Continue" color={"green"} onPress={() => setMenuVisible(false)}/>
-            <Button title="New Game" color={"green"} onPress={() => { startNewGame(); updateCardCollections(); setMenuVisible(false); }}/>
+            <Button title="Restart" color={"green"} onPress={() => { reset(); setMenuVisible(false); }}/>
             <Button title="Return to Title" color={"green"} onPress={() => navigate("/")}/>
+        </PopupMenu>
+        <PopupMenu visible={isWinState}>
+            <Text>You Win!</Text>
+            <Button title="New Game" color={"green"} onPress={reset}/>
+            <Button title="Return to Title" color={"green"} onPress={() => { reset(); navigate("/"); }}/>
         </PopupMenu>
         </GestureHandlerRootView>
     );
