@@ -329,6 +329,7 @@ export default function Index() {
         </PopupMenu>
         <PopupMenu visible={isWinState}>
             <Text>You Win!</Text>
+            <Text>Final Score: {displayScore}</Text>
             <Button title="New Game" color={"green"} onPress={reset}/>
             <Button title="Return to Title" color={"green"} onPress={() => { reset(); navigate("/"); }}/>
         </PopupMenu>
