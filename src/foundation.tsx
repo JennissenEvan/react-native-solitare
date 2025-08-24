@@ -1,6 +1,6 @@
 import { FC } from "react";
 import { Card, CardCollection, getCardDimensions, Suit } from "./deck";
-import { View, StyleSheet, Text } from "react-native";
+import { View, StyleSheet, Text, Image } from "react-native";
 import DropActionReceiver from "./dropActionReceiver";
 import Animated, { AnimatedRef } from "react-native-reanimated";
 import { TransactionController } from "./transaction";
@@ -23,9 +23,17 @@ export class Foundation implements DropActionReceiver {
     }
 
     EmptyPile = (props: FoundationProps) => {
+        //@ts-ignore
+        const emptyFoundationImage = {
+            "hearts": require("../assets/images/hearts_foundation.png"),
+            "clubs": require("../assets/images/clubs_foundation.png"),
+            "spades": require("../assets/images/spades_foundation.png"),
+            "diamonds": require("../assets/images/diamonds_foundation.png")
+        }[this.suit.name.toLowerCase()];
+
         return (
             <Animated.View style={[styleSheet.emptyPile, getCardDimensions()]} ref={props.ref}>
-                <Text>{this.suit.name}</Text>
+                <Image source={emptyFoundationImage} style={{ width: "100%", height: "100%" }}/>
             </Animated.View>
         )
     }
