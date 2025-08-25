@@ -1,3 +1,4 @@
+import React from "react";
 import { Card, CardCollection } from "./deck";
 
 interface TalonProps {

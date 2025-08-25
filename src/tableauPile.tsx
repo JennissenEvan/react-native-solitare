@@ -5,6 +5,7 @@ import DropActionReceiver from "./dropActionReceiver";
 import UsesAnimatedRef from "./usesAnimatedRef";
 import CardCollectionDisplay from "./cardCollectionDisplay";
 import { TransactionController } from "./transaction";
+import React from "react";
 
 const TABLEAU_COMPRESSION = 130;
 

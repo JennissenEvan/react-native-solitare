@@ -1,9 +1,9 @@
-import { FC } from "react";
 import { Card, CardCollection, getCardDimensions, Suit } from "./deck";
-import { View, StyleSheet, Text, Image } from "react-native";
+import { View, StyleSheet, Image } from "react-native";
 import DropActionReceiver from "./dropActionReceiver";
 import Animated, { AnimatedRef } from "react-native-reanimated";
 import { TransactionController } from "./transaction";
+import React from "react";
 
 interface FoundationProps {
     ref: AnimatedRef<View>;
