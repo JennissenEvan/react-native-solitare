@@ -56,7 +56,7 @@ const rankNamesInOrder = [
 const ranks = rankNamesInOrder.toReversed().map((value, i) => new Rank(value, i + 1));
 
 export function getRawCardDimensions() {
-    const CARD_SIZE_FACTOR = .10;
+    const CARD_SIZE_FACTOR = __DEV__ ? .10 : .075;
     const LENGTH_FACTOR = 726/500;
 
     const windowDimensions = Dimensions.get("screen");

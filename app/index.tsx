@@ -344,13 +344,13 @@ export default function Index() {
       <PopupMenu visible={menuVisible}>
         <Button title="Continue" color={"green"} onPress={() => setMenuVisible(false)} />
         <Button title="Restart" color={"green"} onPress={() => { reset(); setMenuVisible(false); }} />
-        <Button title="Return to Title" color={"green"} onPress={() => navigate("/")} />
+        <Button title="Return to Title" color={"green"} onPress={() => { setGameStarted(false); setMenuVisible(false); }} />
       </PopupMenu>
       <PopupMenu visible={isWinState}>
         <Text>You Win!</Text>
         <Text>Final Score: {displayScore}</Text>
         <Button title="New Game" color={"green"} onPress={reset} />
-        <Button title="Return to Title" color={"green"} onPress={() => { reset(); navigate("/"); }} />
+        <Button title="Return to Title" color={"green"} onPress={() => { reset(); setGameStarted(false); setMenuVisible(false); }} />
       </PopupMenu>
     </GestureHandlerRootView>
   );
