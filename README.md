@@ -1,50 +1,13 @@
-# Welcome to your Expo app 👋
+# React Native Solitare
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A basic solitare app built entirely in [React Native](https://reactnative.dev/). Currently, it supports both web and Android.
 
-## Get started
+The web version can be played [here](https://jennissenevan.github.io/react-native-solitare/). The Android apk can be downloaded from the [latest release](https://github.com/JennissenEvan/react-native-solitare/releases).
 
-1. Install dependencies
+## How to Play
 
-   ```bash
-   npm install
-   ```
+This game is based on the [Klondike](https://en.wikipedia.org/wiki/Klondike_(solitaire)) version of solitare. Score points by revealing cards in the tableau, which can be done by stacking them on top of other cards in order of rank and with alternating suits. Cards of each suit can be stacked on their corresponding foundation pile, which starts with aces and goes up in order of rank. The game is finished when all of the four kings are placed in the foundation piles.
 
-2. Start the app
+When there are no more options to rearrage the tableau piles, cards can be drawn from the main deck. Cards will be drawn from the deck in order, and when the pile is empty, it will cycle back from the top. Cards can be drawn an unlimited number of times, but points are lost every time the drawn cards are recycled.
 
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Any mistakes can be reversed with the undo button, but doing so will cause points to be lost.
